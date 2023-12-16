@@ -22,35 +22,53 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
 
-      const socket = io();
+    const socket = io();
+    const keyDisplay = document.getElementById('keyDisplay');
 
-        
 
+    document.addEventListener('mousemove', (event) => {
+        // Send trackpad data to the server
+        socket.emit('trackpadMove', { x: event.clientX, y: event.clientY });
+      });
 
-        const keyDisplay = document.getElementById('keyDisplay');
-        // Listen for keypress events
-        document.addEventListener('keydown', (event) => {
-        // Get the pressed key
-        const key = event.key;
-        console.log('pressed:', key);
-        socket.emit('keyDown', key);
-        // Display the pressed key
-        displayKey(key);
-        });
+      document.addEventListener('mousedown', (event) => {
+        // Determine the button type and send click data to the server
+        const button = event.button === 0 ? 'left' : 'right';
+        socket.emit('mouseDown', { button });
+      });
+    
+      document.addEventListener('mouseup', (event) => {
+        // Determine the button type and send click data to the server
+        const button = event.button === 0 ? 'left' : 'right';
+        socket.emit('mouseUp', { button });
+      });
 
-        document.addEventListener('keyup', (event) => {
-        // Get the released key
-        const key = event.key;
-        console.log('released:', key);
-        socket.emit('keyUp', key);
-        // Display the released key
-        displayKey(key);
-        });
+    // Listen for keypress events
+    document.addEventListener('keydown', (event) => {
 
-        // Function to display the pressed/released key
-        function displayKey(key) {
-        keyDisplay.innerText = `Pressed/Released Key: ${key}`;
-        }
+      // Get the pressed key
+      const key = event.key;
+      console.log('pressed:', key);
+      socket.emit('keyDown', key);
+
+      // Display the pressed key
+      displayKey(key);
+    });
+
+    document.addEventListener('keyup', (event) => {
+      // Get the released key
+      const key = event.key;
+      console.log('released:', key);
+      socket.emit('keyUp', key);
+
+      // Display the released key
+      displayKey(key);
+    });
+
+    // Function to display the pressed/released key
+    function displayKey(key) {
+      keyDisplay.innerText = `Pressed/Released Key: ${key}`;
+    }
   </script>
 </body>
 </html>
