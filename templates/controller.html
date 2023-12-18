@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Press Capture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Key Press Capture</h1>
+  <p>Press any key. Caps Lock, Ctrl, and Shift included.</p>
+  <div id="keyDisplay"></div>
+
+  <!-- Include Socket.IO library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+
+    const socket = io();
+    const keyDisplay = document.getElementById('keyDisplay');
+
+
+    document.addEventListener('mousemove', (event) => {
+        // Send trackpad data to the server
+        socket.emit('trackpadMove', { x: event.clientX, y: event.clientY });
+      });
+
+      document.addEventListener('mousedown', (event) => {
+        // Determine the button type and send click data to the server
+        const button = event.button === 0 ? 'left' : 'right';
+        socket.emit('mouseDown', { button });
+      });
+    
+      document.addEventListener('mouseup', (event) => {
+        // Determine the button type and send click data to the server
+        const button = event.button === 0 ? 'left' : 'right';
+        socket.emit('mouseUp', { button });
+      });
+
+    // Listen for keypress events
+    document.addEventListener('keydown', (event) => {
+
+      // Get the pressed key
+      const key = event.key;
+      console.log('pressed:', key);
+      socket.emit('keyDown', key);
+
+      // Display the pressed key
+      displayKey(key);
+    });
+
+    document.addEventListener('keyup', (event) => {
+      // Get the released key
+      const key = event.key;
+      console.log('released:', key);
+      socket.emit('keyUp', key);
+
+      // Display the released key
+      displayKey(key);
+    });
+
+    // Function to display the pressed/released key
+    function displayKey(key) {
+      keyDisplay.innerText = `Pressed/Released Key: ${key}`;
+    }
+  </script>
+</body>
+</html>
